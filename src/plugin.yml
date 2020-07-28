@@ -1,0 +1,14 @@
+name: Guardception
+description: A plugin to let players define regions only inside certain regions
+version: 1.0.0
+author: EspaCoder
+main: com.reztech.guardception.Guardception
+api-version: 1.16
+depend: [WorldGuard, WorldEdit]
+website: https://github.com/EspaCoder/Guardception
+commands:
+  gception subreg:
+    description: Gives player the permission to define regions inside a certain region.
+    usage: /gception [player] subreg [regionname]
+    permission: guardception.subreg
+    permission-message: You don't have the permission to do this!
