@@ -8,16 +8,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,84 +55,52 @@ public class Guardception extends JavaPlugin implements Listener {
                 sender.sendMessage(Color.RED + "Invalid number of arguments!");
                 return false;
             }
+            // Only check permission if it is a player
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                if (player.hasPermission("guardception.subreg")) {
-                    String option = args[0];
-                    String targetPlayer = args[1];
-                    String regionName = args[2];
-                    World currentWorld = BukkitAdapter.adapt(player.getWorld());
-                    Map<String, ProtectedRegion> regions = worldguardInstance.getPlatform().getRegionContainer().get(currentWorld).getRegions();
-                    // Check if the region exists or if it is the __global__ region
-                    if (!regions.containsKey(regionName) && !regionName.equalsIgnoreCase("__global__")) {
-                        player.sendMessage(ChatColor.RED + regionName + " region does not exist!");
-                        return false;
-                    }
-                    boolean success;
-                    if (option.equalsIgnoreCase("add")) {
-                        success = gcpermissions.addPlayerPermissionInRegion(targetPlayer, regionName);
-                        if (success)
-                            player.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " given to " + targetPlayer);
-                        else
-                            player.sendMessage(ChatColor.RED + "Something went wrong while giving " + targetPlayer + " permision to create regions inside " + regionName);
-                    }
-                    else if (option.equalsIgnoreCase("del")) {
-                        success = gcpermissions.delPlayerPermissionInRegion(targetPlayer, regionName);
-                        if (success)
-                            player.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " denied to " + targetPlayer);
-                        else
-                            player.sendMessage(ChatColor.RED + "Something went wrong while denying " + targetPlayer + " permision to create regions inside " + regionName);
-                    }
-                    else if (option.equalsIgnoreCase("check")) {
-                        boolean hasPermission = gcpermissions.hasPlayerPermissionInRegion(targetPlayer, regionName);
-                        String doesOrNot = hasPermission ? "does" : "does not";
-                        ChatColor color = hasPermission ? ChatColor.AQUA : ChatColor.RED;
-                        player.sendMessage(color + targetPlayer + " " + doesOrNot + " have permission to create regions inside " + regionName);
-                    }
-                }
-                else
+                if (!player.hasPermission("guardception.subreg")) {
                     player.sendMessage(ChatColor.RED + "You do not have permission to do such an action!");
-            }
-            else {
-                String option = args[0];
-                String targetPlayer = args[1];
-                String regionName = args[2];
-                List<org.bukkit.World> worlds = Bukkit.getWorlds();
-                boolean found = false;
-                for (org.bukkit.World world : worlds) {
-                    World currentWorld = BukkitAdapter.adapt(world);
-                    Map<String, ProtectedRegion> regions = worldguardInstance.getPlatform().getRegionContainer().get(currentWorld).getRegions();
-                    // Check if the region exists or if it is the __global__ region
-                    if (regions.containsKey(regionName) || regionName.equalsIgnoreCase("__global__")) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    sender.sendMessage(ChatColor.RED + regionName + " region does not exist!");
                     return false;
                 }
-                boolean success;
-                if (option.equalsIgnoreCase("add")) {
-                    success = gcpermissions.addPlayerPermissionInRegion(targetPlayer, regionName);
-                    if (success)
-                        sender.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " given to " + targetPlayer);
-                    else
-                        sender.sendMessage(ChatColor.RED + "Something went wrong while giving " + targetPlayer + " permision to create regions inside " + regionName);
+            }
+            String option = args[0];
+            String targetPlayer = args[1];
+            String regionName = args[2];
+            List<org.bukkit.World> worlds = Bukkit.getWorlds();
+            boolean found = false;
+            for (org.bukkit.World world : worlds) {
+                World currentWorld = BukkitAdapter.adapt(world);
+                Map<String, ProtectedRegion> regions = worldguardInstance.getPlatform().getRegionContainer().get(currentWorld).getRegions();
+                // Check if the region exists or if it is the __global__ region
+                if (regions.containsKey(regionName) || regionName.equalsIgnoreCase("__global__")) {
+                    found = true;
+                    break;
                 }
-                else if (option.equalsIgnoreCase("del")) {
-                    success = gcpermissions.delPlayerPermissionInRegion(targetPlayer, regionName);
-                    if (success)
-                        sender.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " denied to " + targetPlayer);
-                    else
-                        sender.sendMessage(ChatColor.RED + "Something went wrong while denying " + targetPlayer + " permision to create regions inside " + regionName);
-                }
-                else if (option.equalsIgnoreCase("check")) {
-                    boolean hasPermission = gcpermissions.hasPlayerPermissionInRegion(targetPlayer, regionName);
-                    String doesOrNot = hasPermission ? "does" : "does not";
-                    ChatColor color = hasPermission ? ChatColor.AQUA : ChatColor.RED;
-                    sender.sendMessage(color + targetPlayer + " " + doesOrNot + " have permission to create regions inside " + regionName);
-                }
+            }
+            if (!found) {
+                sender.sendMessage(ChatColor.RED + regionName + " region does not exist!");
+                return false;
+            }
+            boolean success;
+            if (option.equalsIgnoreCase("add")) {
+                success = gcpermissions.addPlayerPermissionInRegion(targetPlayer, regionName);
+                if (success)
+                    sender.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " given to " + targetPlayer);
+                else
+                    sender.sendMessage(ChatColor.RED + "Something went wrong while giving " + targetPlayer + " permision to create regions inside " + regionName);
+            }
+            else if (option.equalsIgnoreCase("del")) {
+                success = gcpermissions.delPlayerPermissionInRegion(targetPlayer, regionName);
+                if (success)
+                    sender.sendMessage(ChatColor.AQUA + "Permission to create regions inside " + regionName + " denied to " + targetPlayer);
+                else
+                    sender.sendMessage(ChatColor.RED + "Something went wrong while denying " + targetPlayer + " permision to create regions inside " + regionName);
+            }
+            else if (option.equalsIgnoreCase("check")) {
+                boolean hasPermission = gcpermissions.hasPlayerPermissionInRegion(targetPlayer, regionName);
+                String doesOrNot = hasPermission ? "does" : "does not";
+                ChatColor color = hasPermission ? ChatColor.AQUA : ChatColor.RED;
+                sender.sendMessage(color + targetPlayer + " " + doesOrNot + " have permission to create regions inside " + regionName);
             }
         }
         return true;
