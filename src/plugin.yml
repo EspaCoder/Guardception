@@ -9,6 +9,6 @@ website: https://github.com/EspaCoder/Guardception
 commands:
   gception:
     description: "Gives player the permission to define regions inside a certain region."
-    usage: /gception (add | del | check) [player] [regionname]
+    usage: /gception (add | del | check) <player> <regionname>
     permission: guardception.subreg
     permission-message: "You don't have the permission to do this!"

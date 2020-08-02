@@ -92,4 +92,23 @@ public class GuardceptionPermissions {
         return true;
     }
 
+    public boolean deleteRegion(String regionName) {
+        Set<String> players = regionalPermissions.getKeys(false);
+        List<String> regions;
+        for (String player : players) {
+            regions = regionalPermissions.getStringList(player);
+            if (regions.contains(regionName))
+                regions.remove(regionName);
+            regionalPermissions.set(player, regions);
+        }
+        try {
+            regionalPermissions.save(filePath);
+        }
+        catch (IOException e) {
+            guardceptionPlugin.getLogger().log(Level.SEVERE, "Could not write to file " + filePath);
+            return false;
+        }
+        return true;
+    }
+
 }
